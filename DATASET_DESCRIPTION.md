@@ -11,14 +11,14 @@ The labels are the governing policy of each task: which mechanism drives it (a c
 - Raw files: 12
 - Sites (cases): 1,300
 - Operators (grouping keys): 65, 20 sites each
-- Maintenance tasks: 15,057, 8 to 15 per site
+- Maintenance tasks: 15,014, 8 to 15 per site
 - Meters: 3,236, 2 or 3 per site, of kind hours, starts or cycles
-- Meter readings: 121,975, between 11 and 84 per meter
-- Completed services: 251,493, between 5 and 60 per task
+- Meter readings: 121,874, between 10 and 82 per meter
+- Completed services: 255,426, between 5 and 60 per task
 - Observation window: days 1 to 1,120
 - Component types: 12
-- Mechanism mix: 52.8 percent calendar, 34.4 percent usage, 12.7 percent whichever_first
-- Tasks with a parent: 26.4 percent
+- Mechanism mix: 51.8 percent calendar, 34.7 percent usage, 13.4 percent whichever_first
+- Tasks with a parent: 24.0 percent
 - Interval menu, days: 30, 45, 60, 90, 120, 180
 - Threshold menu, meter units: 100, 250, 500, 750, 1000, 1500, 2000, 3000
 - Prepared split: 53 operators / 1,060 training sites, 12 operators / 240 test sites
@@ -46,7 +46,7 @@ The uploaded ZIP is flat and contains exactly these twelve files at its root:
 ### sites.csv
 
 - `case_id` (string): opaque site identifier, a keyed hash, for example `site_3f9c1a7b2e`.
-- `family_id` (string): opaque operator key, for example `op_3e422bdb`. Sites of one operator share its working habits: lateness, skipping, batching and meter-reading frequency.
+- `family_id` (string): opaque operator key, for example `op_3e422bdb`. Sites of one operator share its working habits: route cycle, lateness, skipping, batching and meter-reading frequency.
 - `n_tasks` (integer): number of maintenance tasks at the site, 8 to 15.
 - `n_meters` (integer): number of meters at the site, 2 or 3.
 
@@ -66,7 +66,7 @@ The uploaded ZIP is flat and contains exactly these twelve files at its root:
 
 - `case_id` (string) and `meter_id` (string): the site and the meter.
 - `day` (integer): day of the reading, 1 to 1,120.
-- `value` (integer): the counter shown on that day. Counters normally only rise; a counter that was replaced restarts from zero, so its readings drop once at the replacement. 34.7 percent of meters show such a drop.
+- `value` (integer): the counter shown on that day. Counters normally only rise; a counter that was replaced restarts from zero, so its readings drop once at the replacement. 36.9 percent of meters show such a drop.
 
 ### events.csv
 
@@ -82,7 +82,7 @@ The uploaded ZIP is flat and contains exactly these twelve files at its root:
 
 **Usage.** Each site has a shared load profile: an annual seasonal swing of 0 to 60 percent, week-to-week variation, and one to eight idle spells of one to six weeks during which usage almost stops. Each meter has its own base daily rate for its kind and mixes the shared load with an independent profile of its own, so meters on one site are correlated to different degrees. About a third of meters are replaced once, and their counters restart from zero.
 
-**Readings.** Each operator reads meters on a nominal cycle of 14, 28, 42 or 63 days. Each gap varies between half and one and a half times that cycle, and about one reading in ten is missing. Reading days are drawn independently of service days; 12.4 percent of readings happen to fall on a day with a service.
+**Readings.** Each operator reads meters on a nominal cycle of 14, 28, 42 or 63 days. Each gap varies between half and one and a half times that cycle, and about one reading in ten is missing. Reading days are drawn independently of service days; 7.5 percent of readings happen to fall on a day with a service.
 
 **Policies.** Each task draws a component type, and the type's tendencies weight the draws of mechanism, meter kind, interval and threshold. The rules are:
 - `calendar`: service falls due the given number of days after the last service.
@@ -92,12 +92,13 @@ The uploaded ZIP is flat and contains exactly these twelve files at its root:
 About three tasks in ten are given a parent among the site's other tasks.
 
 **Operations.** Sites are simulated day by day from the true meter trajectories. The clock of a task restarts at every completion.
-- A due service is completed 0 to 14 days late, depending on the operator.
+- Technicians visit each site on a fixed route every 7 or 14 days, depending on the operator, and services are carried out only on route visits.
+- A due service is completed at the route visit nearest to its due day plus a lateness of 0 to 14 days, depending on the operator, so a service can land up to half a route cycle early or late.
 - 0 to 15 percent of due services are skipped silently, still restarting the clock.
 - On a visit, tasks due within the operator's batching window of 0, 2 or 4 days are pulled forward half of the time.
-- When a parent is serviced, a child that is at least 60 percent through its cycle is serviced on the same day.
+- When a parent is serviced, a child that is at least 50 percent through its cycle is serviced on the same visit.
 - A task is kept only with 5 to 60 completions.
-- A parent link that never pulled its child forward during the window leaves no trace in the data and is recorded as `no_parent`.
+- A parent link is recorded only if it pulled its child forward at least once by more than half a route cycle plus 4 days, which is more than routine scheduling can explain. A link that never did so leaves no usable trace in the data and is recorded as `no_parent`.
 
 **Keys and identifiers.** All randomness, every identifier and the component-type tendencies derive by HMAC-SHA256 from a 256-bit secret held by the creator. The secret and the generator code are withheld, and the secret appears in no released file. Sites are written in hashed-id order, and tasks and meters in hashed-id order within a site, so no ordering carries generator information.
 
@@ -116,7 +117,7 @@ The public directory also holds `LICENSE`; no other raw document is copied into 
 ## Characteristics
 
 - Operators never appear in both prepared splits, so their habits must be inferred rather than memorised.
-- Identifiability is uneven by construction. A flat usage profile makes calendar and usage rules hard to separate, correlated meters make the counted meter hard to name, and a parent that pulled its child only once or twice leaves thin evidence. This is why every target is a calibrated belief rather than a single answer.
+- Identifiability is uneven by construction. A flat usage profile makes calendar and usage rules hard to separate, correlated meters make the counted meter hard to name, and a parent that pulled its child only once or twice leaves thin evidence. Because every service falls on a route visit, unrelated tasks routinely share service days, so sharing a day is not by itself evidence of a parent. This is why every target is a calibrated belief rather than a single answer.
 - No column in any released file is ever empty, constant, or a token that a data profiler reads as a missing or infinite number.
 
 ## Known Limitations
