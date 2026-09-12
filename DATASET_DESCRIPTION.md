@@ -1,4 +1,4 @@
-# Service Policy Archaeology Dataset v2: Coupled Maintenance Rules Behind Sparse Meter Logs
+# Service Policy Archaeology Dataset: Coupled Maintenance Rules Behind Sparse Meter Logs
 
 ## Overview
 
@@ -22,7 +22,7 @@ The labels are the governing policy of each task: which mechanism drives it (a c
 - Interval menu, days: 30, 45, 60, 90, 120, 180
 - Threshold menu, meter units: 100, 250, 500, 750, 1000, 1500, 2000, 3000
 - Prepared split: 53 operators / 1,060 training sites, 12 operators / 240 test sites
-- Data origin: creator-generated synthetic data, version 2
+- Data origin: creator-generated synthetic data
 
 ## Raw File Structure
 
@@ -129,4 +129,4 @@ The public directory also holds `LICENSE`; no other raw document is copied into 
 
 ## Provenance And License
 
-All records are produced by an original synthetic generation procedure written for this dataset. The package is released under Creative Commons Attribution 4.0 International (CC BY 4.0). Attribution: Esmael Abdlkadr, Service Policy Archaeology Dataset v2 (2026).
+All records are produced by an original synthetic generation procedure written for this dataset. The package is released under Creative Commons Attribution 4.0 International (CC BY 4.0). Attribution: Esmael Abdlkadr, Service Policy Archaeology Dataset (2026).

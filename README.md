@@ -1,11 +1,10 @@
-# Service Policy Archaeology Dataset v2: Coupled Maintenance Rules Behind Sparse Meter Logs
+# Service Policy Archaeology Dataset: Coupled Maintenance Rules Behind Sparse Meter Logs
 
 An original synthetic benchmark of 1,300 maintenance sites run by 65 operators. Every site keeps a work log of completed services and irregular, partly missing readings of two or three usage meters, some of which are replaced and restart from zero. Every maintenance task follows a hidden servicing policy: a calendar interval, a usage threshold on one of the site's meters, or whichever of the two comes first. Some tasks also have a hidden parent, and are serviced on the parent's visit when they are far enough through their own cycle. The labels are the complete policy of every task: mechanism, counted meter, interval, threshold and parent.
 
-- Licence: CC BY 4.0. Attribution: Esmael Abdlkadr, Service Policy Archaeology Dataset v2 (2026).
+- Licence: CC BY 4.0. Attribution: Esmael Abdlkadr, Service Policy Archaeology Dataset (2026).
 - Contents of this repository: `DATASET_DESCRIPTION.md`, the full dataset card, identical to the copy inside the release archive, and `LICENSE`.
 - The release archive itself is distributed on the challenge platform, not here.
-- Version 2 replaces version 1 (600 sites with a single weekly usage record per site); version 1 is withdrawn.
 
 ## Reproducibility and answer safety
 
