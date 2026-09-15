@@ -2,33 +2,32 @@
 
 ## Overview
 
-This is an original, fully synthetic dataset of 1,300 maintenance sites run by 65 operators. Every site keeps a work log of completed services and irregular readings of two or three usage meters, and every maintenance task on the site follows a hidden servicing policy. The dataset contains no real operational records, no customer data and no third-party material; every row was produced by the generation procedure described below.
+This is an original, fully synthetic dataset of 5,000 maintenance sites, each run by its own operator. Every site keeps a work log of completed services and irregular readings of two or three usage meters, and every maintenance task on the site follows a hidden servicing policy. The dataset contains no real operational records, no customer data and no third-party material; every row was produced by the generation procedure described below.
 
 The labels are the governing policy of each task: which mechanism drives it (a calendar interval, a usage threshold on one meter, or whichever of the two comes first), which meter it counts, the interval and threshold values, and which other task on the site, if any, is its parent. A child task is serviced on its parent's visit when it is far enough through its own cycle.
 
 ## Release At A Glance
 
 - Raw files: 12
-- Sites (cases): 1,300
-- Operators (grouping keys): 65, 20 sites each
-- Maintenance tasks: 15,014, 8 to 15 per site
-- Meters: 3,236, 2 or 3 per site, of kind hours, starts or cycles
-- Meter readings: 121,874, between 10 and 82 per meter
-- Completed services: 255,426, between 5 and 60 per task
+- Sites (cases): 5,000, each with its own operator, so every site is an independent unit
+- Maintenance tasks: 57,373, 8 to 15 per site
+- Meters: 12,513, 2 or 3 per site, of kind hours, starts or cycles
+- Meter readings: 469,433, between 10 and 88 per meter
+- Completed services: 977,769, between 5 and 60 per task
 - Observation window: days 1 to 1,120
 - Component types: 12
-- Mechanism mix: 51.8 percent calendar, 34.7 percent usage, 13.4 percent whichever_first
-- Tasks with a parent: 24.0 percent
+- Mechanism mix: 52.2 percent calendar, 34.5 percent usage, 13.3 percent whichever_first
+- Tasks with a parent: 23.5 percent
 - Interval menu, days: 30, 45, 60, 90, 120, 180
 - Threshold menu, meter units: 100, 250, 500, 750, 1000, 1500, 2000, 3000
-- Prepared split: 53 operators / 1,060 training sites, 12 operators / 240 test sites
+- Prepared split: 4,000 training sites, 1,000 test sites (every fifth site in hashed-id order)
 - Data origin: creator-generated synthetic data
 
 ## Raw File Structure
 
 The uploaded ZIP is flat and contains exactly these twelve files at its root:
 
-- `sites.csv`: one record per site: `case_id`, `family_id`, `n_tasks`, `n_meters`.
+- `sites.csv`: one record per site: `case_id`, `n_tasks`, `n_meters`.
 - `meters.csv`: one record per meter: `case_id`, `meter_id`, `kind`.
 - `tasks.csv`: one record per maintenance task: `case_id`, `task_id`, `component_type`.
 - `readings.csv`: one record per meter reading: `case_id`, `meter_id`, `day`, `value`.
@@ -46,7 +45,6 @@ The uploaded ZIP is flat and contains exactly these twelve files at its root:
 ### sites.csv
 
 - `case_id` (string): opaque site identifier, a keyed hash, for example `site_3f9c1a7b2e`.
-- `family_id` (string): opaque operator key, for example `op_3e422bdb`. Sites of one operator share its working habits: route cycle, lateness, skipping, batching and meter-reading frequency.
 - `n_tasks` (integer): number of maintenance tasks at the site, 8 to 15.
 - `n_meters` (integer): number of meters at the site, 2 or 3.
 
@@ -82,7 +80,7 @@ The uploaded ZIP is flat and contains exactly these twelve files at its root:
 
 **Usage.** Each site has a shared load profile: an annual seasonal swing of 0 to 60 percent, week-to-week variation, and one to eight idle spells of one to six weeks during which usage almost stops. Each meter has its own base daily rate for its kind and mixes the shared load with an independent profile of its own, so meters on one site are correlated to different degrees. About a third of meters are replaced once, and their counters restart from zero.
 
-**Readings.** Each operator reads meters on a nominal cycle of 14, 28, 42 or 63 days. Each gap varies between half and one and a half times that cycle, and about one reading in ten is missing. Reading days are drawn independently of service days; 7.5 percent of readings happen to fall on a day with a service.
+**Readings.** Each site's operator reads its meters on a nominal cycle of 14, 28, 42 or 63 days. Each gap varies between half and one and a half times that cycle, and about one reading in ten is missing. Reading days are drawn independently of service days; 7.5 percent of readings happen to fall on a day with a service.
 
 **Policies.** Each task draws a component type, and the type's tendencies weight the draws of mechanism, meter kind, interval and threshold. The rules are:
 - `calendar`: service falls due the given number of days after the last service.
@@ -106,17 +104,17 @@ About three tasks in ten are given a parent among the site's other tasks.
 
 `prepare.py` writes a flat public directory plus a private answer directory. Every prepared file is keyed by `case_id` with one row per site.
 
-- public `train.csv` (1,060 rows): `case_id`, `family_id`, `n_tasks`, `meters_json`, `tasks_json`, `readings_json`, `events_json`. The JSON columns hold the site's rows from `meters.csv`, `tasks.csv`, `readings.csv` (as `[meter_id, day, value]`) and `events.csv` (as `[task_id, day]`).
-- public `test.csv` (240 rows): the same columns for the held-out sites.
-- public `train_labels.csv` (1,060 rows): `case_id` and `prediction_json`, the true policy of every training task in the submission format, `{"tasks": {task_id: {...}}}`.
-- public `sample_submission.csv` (240 rows): `case_id` and `prediction_json`, structurally valid with no opinion on any task.
-- private `answers.csv` (240 rows): the same for the test sites, plus reserved fields listing each site's meters and the complete set of test case IDs. It has the same columns as `sample_submission.csv`, and the grader ignores reserved fields, so the answer key is itself a perfect submission.
+- public `train.csv` (4,000 rows): `case_id`, `n_tasks`, `meters_json`, `tasks_json`, `readings_json`, `events_json`. The JSON columns hold the site's rows from `meters.csv`, `tasks.csv`, `readings.csv` (as `[meter_id, day, value]`) and `events.csv` (as `[task_id, day]`).
+- public `test.csv` (1,000 rows): the same columns for the held-out sites.
+- public `train_labels.csv` (4,000 rows): `case_id` and `prediction_json`, the true policy of every training task in the submission format, `{"tasks": {task_id: {...}}}`, with `no_meter`, `no_interval` and `no_threshold` for the parts a rule does not use.
+- public `sample_submission.csv` (1,000 rows): `case_id` and `prediction_json`, structurally valid with no opinion on any task.
+- private `answers.csv` (1,000 rows): the same for the test sites, plus reserved fields listing each site's meters and the complete set of test case IDs. It has the same columns as `sample_submission.csv`, and the grader ignores reserved fields, so the answer key is itself a perfect submission.
 
 The public directory also holds `LICENSE`; no other raw document is copied into it, so nothing a solver receives names the dataset or its author. The preparation self-check verifies that the key agrees with the public inputs: every labelled task, meter and parent exists on its site, and every rule's fields are consistent with its mechanism.
 
 ## Characteristics
 
-- Operators never appear in both prepared splits, so their habits must be inferred rather than memorised.
+- Every site has its own operator, whose habits (route cycle, lateness, skipping, batching, reading frequency) are drawn independently, so no two sites share anything but the generation procedure and the component-type tendencies. Any subset of test sites is a valid evaluation set.
 - Identifiability is uneven by construction. A flat usage profile makes calendar and usage rules hard to separate, correlated meters make the counted meter hard to name, and a parent that pulled its child only once or twice leaves thin evidence. Because every service falls on a route visit, unrelated tasks routinely share service days, so sharing a day is not by itself evidence of a parent. This is why every target is a calibrated belief rather than a single answer.
 - No column in any released file is ever empty, constant, or a token that a data profiler reads as a missing or infinite number.
 
