@@ -51,7 +51,7 @@ The uploaded ZIP is flat and contains exactly these twelve files at its root:
 ### meters.csv
 
 - `case_id` (string): joins to `sites.csv`.
-- `meter_id` (string): opaque meter identifier, unique within the release.
+- `meter_id` (string): opaque meter identifier, unique within its site; always use it together with `case_id`.
 - `kind` (string): `hours`, `starts` or `cycles`. A site never has two meters of the same kind.
 
 ### tasks.csv
@@ -64,7 +64,7 @@ The uploaded ZIP is flat and contains exactly these twelve files at its root:
 
 - `case_id` (string) and `meter_id` (string): the site and the meter.
 - `day` (integer): day of the reading, 1 to 1,120.
-- `value` (integer): the counter shown on that day. Counters normally only rise; a counter that was replaced restarts from zero, so its readings drop once at the replacement. 36.9 percent of meters show such a drop.
+- `value` (integer): the counter shown on that day. Counters normally only rise; a counter that was replaced restarts from zero, so its readings drop once at the replacement. 34.7 percent of meters show such a drop.
 
 ### events.csv
 
@@ -74,13 +74,13 @@ The uploaded ZIP is flat and contains exactly these twelve files at its root:
 ### labels.csv
 
 - `case_id` (string): joins to the other tables.
-- `labels_json` (JSON object string): per task, `mechanism` (`calendar`, `usage` or `whichever_first`); `meter` (the counted meter's id, or `no_meter` for a calendar rule); `interval_days` (from the interval menu, or 0 when the rule has no calendar part); `usage_threshold` (from the threshold menu, or 0 when the rule counts no usage); `parent` (another task id of the same site, or `no_parent`).
+- `labels_json` (JSON object string): per task, `mechanism` (`calendar`, `usage` or `whichever_first`); `meter` (the counted meter's id, or `no_meter` for a calendar rule); `interval_days` (from the interval menu, or `no_interval` when the rule has no calendar part); `usage_threshold` (from the threshold menu, or `no_threshold` when the rule counts no usage); `parent` (another task id of the same site, or `no_parent`).
 
 ## How The Data Is Generated
 
 **Usage.** Each site has a shared load profile: an annual seasonal swing of 0 to 60 percent, week-to-week variation, and one to eight idle spells of one to six weeks during which usage almost stops. Each meter has its own base daily rate for its kind and mixes the shared load with an independent profile of its own, so meters on one site are correlated to different degrees. About a third of meters are replaced once, and their counters restart from zero.
 
-**Readings.** Each site's operator reads its meters on a nominal cycle of 14, 28, 42 or 63 days. Each gap varies between half and one and a half times that cycle, and about one reading in ten is missing. Reading days are drawn independently of service days; 7.5 percent of readings happen to fall on a day with a service.
+**Readings.** Each site's operator reads its meters on a nominal cycle of 14, 28, 42 or 63 days. Each gap varies between half and one and a half times that cycle, and about one reading in ten is missing. Reading days are drawn independently of service days; 7.4 percent of readings happen to fall on a day with a service.
 
 **Policies.** Each task draws a component type, and the type's tendencies weight the draws of mechanism, meter kind, interval and threshold. The rules are:
 - `calendar`: service falls due the given number of days after the last service.
