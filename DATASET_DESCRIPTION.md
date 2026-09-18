@@ -12,14 +12,14 @@ The labels are the governing policy of each task: which mechanism drives it (a c
 - Sites (cases): 5,000, each with its own operator, so every site is an independent unit
 - Maintenance tasks: 57,373, 8 to 15 per site
 - Meters: 12,513, 2 or 3 per site, of kind hours, starts or cycles
-- Meter readings: 469,433, between 10 and 88 per meter
-- Completed services: 977,769, between 5 and 60 per task
+- Meter readings: 275,344, between 6 and 44 per meter
+- Completed services: 888,652, between 5 and 60 per task
 - Observation window: days 1 to 1,120
 - Component types: 12
 - Mechanism mix: 52.2 percent calendar, 34.5 percent usage, 13.3 percent whichever_first
 - Tasks with a parent: 23.5 percent
-- Interval menu, days: 30, 45, 60, 90, 120, 180
-- Threshold menu, meter units: 100, 250, 500, 750, 1000, 1500, 2000, 3000
+- Interval menu, days: 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 135, 150, 165, 180
+- Threshold menu, meter units: 100, 200, 300, 400, 500, 600, 750, 900, 1000, 1250, 1500, 1750, 2000, 2500, 3000
 - Prepared split: 4,000 training sites, 1,000 test sites (every fifth site in hashed-id order)
 - Data origin: creator-generated synthetic data
 
@@ -80,7 +80,7 @@ The uploaded ZIP is flat and contains exactly these twelve files at its root:
 
 **Usage.** Each site has a shared load profile: an annual seasonal swing of 0 to 60 percent, week-to-week variation, and one to eight idle spells of one to six weeks during which usage almost stops. Each meter has its own base daily rate for its kind and mixes the shared load with an independent profile of its own, so meters on one site are correlated to different degrees. About a third of meters are replaced once, and their counters restart from zero.
 
-**Readings.** Each site's operator reads its meters on a nominal cycle of 14, 28, 42 or 63 days. Each gap varies between half and one and a half times that cycle, and about one reading in ten is missing. Reading days are drawn independently of service days; 7.4 percent of readings happen to fall on a day with a service.
+**Readings.** Each site's operator reads its meters on a nominal cycle of 28, 42, 63 or 91 days. Each gap varies between half and one and a half times that cycle, and about one reading in ten is missing. Reading days are drawn independently of service days; 7.4 percent of readings happen to fall on a day with a service.
 
 **Policies.** Each task draws a component type, and the type's tendencies weight the draws of mechanism, meter kind, interval and threshold. The rules are:
 - `calendar`: service falls due the given number of days after the last service.
@@ -91,8 +91,8 @@ About three tasks in ten are given a parent among the site's other tasks.
 
 **Operations.** Sites are simulated day by day from the true meter trajectories. The clock of a task restarts at every completion.
 - Technicians visit each site on a fixed route every 7 or 14 days, depending on the operator, and services are carried out only on route visits.
-- A due service is completed at the route visit nearest to its due day plus a lateness of 0 to 14 days, depending on the operator, so a service can land up to half a route cycle early or late.
-- 0 to 15 percent of due services are skipped silently, still restarting the clock.
+- A due service is completed at the route visit nearest to its due day plus a lateness of 3 to 21 days, depending on the operator, so a service can land up to half a route cycle early or late.
+- 5 to 20 percent of due services are skipped silently, still restarting the clock.
 - On a visit, tasks due within the operator's batching window of 0, 2 or 4 days are pulled forward half of the time.
 - When a parent is serviced, a child that is at least 50 percent through its cycle is serviced on the same visit.
 - A task is kept only with 5 to 60 completions.
