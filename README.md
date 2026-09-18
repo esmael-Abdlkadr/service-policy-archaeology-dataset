@@ -1,4 +1,4 @@
-# Service Policy Archaeology Dataset: Coupled Maintenance Rules Behind Sparse Meter Logs
+# Service Policy Archaeology Dataset: Hidden Maintenance Rules Behind Sparse Meter Logs
 
 An original synthetic benchmark of 5,000 maintenance sites, each run by its own operator, so every site is an independent unit. Every site keeps a work log of completed services, carried out on technician route visits every 7 or 14 days, and irregular, partly missing readings of two or three usage meters, some of which are replaced and restart from zero. Every maintenance task follows a hidden servicing policy: a calendar interval, a usage threshold on one of the site's meters, or whichever of the two comes first. Some tasks also have a hidden parent, and are serviced on the parent's visit when they are far enough through their own cycle. The labels are the complete policy of every task: mechanism, counted meter, interval, threshold and parent.
 
